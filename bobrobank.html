@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бобро-Банк</title>
+    <style>
+        :root { --primary: #10B981; --primary-hover: #059669; --bg: #F3F4F6; --text: #111827; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .bank-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        h1 { margin-top: 0; color: var(--text); font-size: 28px; }
+        
+        .card-visual { background: linear-gradient(135deg, #1F2937, #374151); color: white; padding: 25px; border-radius: 15px; margin-bottom: 25px; text-align: left; position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .card-visual::after { content: '🦫'; font-size: 80px; position: absolute; right: -10px; bottom: -20px; opacity: 0.1; }
+        .card-title { font-size: 12px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+        .card-number { font-size: 20px; letter-spacing: 2px; font-family: monospace; margin-bottom: 20px; }
+        .card-balance { font-size: 28px; font-weight: bold; color: #10B981; }
+
+        input { width: 100%; padding: 14px; margin-bottom: 15px; border: 2px solid #E5E7EB; border-radius: 10px; font-size: 16px; outline: none; box-sizing: border-box; text-align: center; }
+        input:focus { border-color: var(--primary); }
+        
+        .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; width: 100%; transition: 0.2s; margin-bottom: 10px; }
+        .btn:hover { background: var(--primary-hover); transform: scale(1.02); }
+        .btn-outline { background: transparent; color: #4B5563; border: 2px solid #E5E7EB; }
+        .btn-outline:hover { background: #F9FAFB; border-color: #D1D5DB; }
+
+        .error { color: #EF4444; font-size: 14px; margin-bottom: 15px; font-weight: 600; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="bank-card">
+        <h1>🏦 Бобро-Банк</h1>
+        
+        <div class="card-visual">
+            <div class="card-title">Bobr Premium Card</div>
+            <div class="card-number" id="uiCardNumber">---- ---- ---- ----</div>
+            <div class="card-title">Поточний Баланс</div>
+            <div class="card-balance" id="uiBalance">0 грн</div>
+        </div>
+
+        <div id="errorMsg" class="error">Помилка!</div>
+
+        <div id="topupSection">
+            <input type="number" id="amountInput" placeholder="Сума поповнення (макс. 1 000 000)">
+            <input type="text" id="promoInput" placeholder="Секретний промокод (опціонально)">
+            <button class="btn" onclick="processTopUp()">💵 Поповнити рахунок</button>
+        </div>
+
+        <button class="btn btn-outline" onclick="generateNewCard()">♻️ Випустити нову картку</button>
+        <button class="btn btn-outline" style="margin-top: 20px; border: none; text-decoration: underline;" onclick="window.location.href='index.html'">Повернутися в магазин</button>
+    </div>
+
+    <script>
+        let currentCard = localStorage.getItem('bobCard');
+        let currentBalance = parseFloat(localStorage.getItem('bobBalance')) || 0;
+
+        function updateUI() {
+            document.getElementById('uiCardNumber').innerText = currentCard || "НЕМАЄ КАРТКИ";
+            document.getElementById('uiBalance').innerText = currentBalance.toLocaleString('uk-UA') + " грн";
+            
+            // Ховаємо секцію поповнення, якщо немає картки
+            document.getElementById('topupSection').style.display = currentCard ? 'block' : 'none';
+        }
+
+        function showError(msg) {
+            let err = document.getElementById('errorMsg');
+            err.innerText = msg;
+            err.style.display = 'block';
+            setTimeout(() => err.style.display = 'none', 4000);
+        }
+
+        function generateNewCard() {
+            let p1 = Math.floor(1000 + Math.random() * 9000);
+            let p2 = Math.floor(1000 + Math.random() * 9000);
+            currentCard = `BOBER-${p1}-${p2}`;
+            
+            localStorage.setItem('bobCard', currentCard);
+            // При випуску нової картки ми не обнуляємо баланс, але дозволяємо нове поповнення
+            
+            updateUI();
+            showError("✅ Нову картку успішно випущено!");
+            document.getElementById('errorMsg').style.color = "#10B981";
+        }
+
+        function processTopUp() {
+            let amount = parseFloat(document.getElementById('amountInput').value);
+            let promo = document.getElementById('promoInput').value.trim().toUpperCase();
+            
+            if (isNaN(amount) || amount <= 0) return showError("❌ Введи нормальну суму!");
+
+            // Перевірка чи ця картка вже поповнювалась
+            let isUsed = localStorage.getItem('bobCardUsed_' + currentCard);
+            if (isUsed === 'true') {
+                return showError("❌ Цю картку вже поповнювали! Тисни 'Випустити нову картку'.");
+            }
+
+            // Перевірка лімітів і магії
+            let maxLimit = 1000000;
+            
+            if (promo === 'ARTIK200K') {
+                maxLimit = Infinity; // Промокод знімає всі обмеження!
+            } else if (promo !== '') {
+                return showError("❌ Невірний промокод!");
+            }
+
+            if (amount > maxLimit) {
+                return showError("❌ Бобро-податкова блокує перекази більше 1 000 000 грн! Шукай промокод.");
+            }
+
+            // Успішне поповнення
+            currentBalance += amount;
+            localStorage.setItem('bobBalance', currentBalance);
+            localStorage.setItem('bobCardUsed_' + currentCard, 'true'); // Помічаємо картку як використану
+
+            document.getElementById('amountInput').value = '';
+            document.getElementById('promoInput').value = '';
+            
+            updateUI();
+            
+            document.getElementById('errorMsg').style.color = "#10B981";
+            if(promo === 'ARTIK200K') {
+                showError("🚀 ПРОМОКОД ПРИЙНЯТО! Ліміти знято. Гроші зараховано!");
+            } else {
+                showError("✅ Рахунок успішно поповнено!");
+            }
+            setTimeout(() => { document.getElementById('errorMsg').style.color = "#EF4444"; }, 4000);
+        }
+
+        window.onload = function() {
+            if (!currentCard) generateNewCard();
+            updateUI();
+        };
+    </script>
+</body>
+</html>
