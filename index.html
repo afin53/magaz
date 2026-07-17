@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bobrisk.shop</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg: #F3F4F6;
+            --sidebar: #1F2937;
+            --sidebar-text: #F9FAFB;
+            --sidebar-hover: #374151;
+            --card-bg: #FFFFFF;
+            --text: #111827;
+            --text-muted: #6B7280;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; display: flex; height: 100vh; background-color: var(--bg); color: var(--text); overflow: hidden; }
+
+        nav { width: 260px; background-color: var(--sidebar); color: var(--sidebar-text); padding: 20px 0; display: flex; flex-direction: column; flex-shrink: 0; }
+        .logo { margin: 0 20px 30px 20px; font-size: 26px; color: #fff; letter-spacing: 1px; cursor: pointer; transition: 0.2s; user-select: none; }
+        .logo:active { transform: scale(0.9) rotate(-5deg); color: #10B981; }
+
+        nav .nav-item { padding: 16px 24px; cursor: pointer; transition: 0.2s; font-size: 16px; display: flex; align-items: center; }
+        nav .nav-item:hover { background-color: var(--sidebar-hover); border-left: 4px solid var(--primary); padding-left: 20px; }
+        nav hr { border-color: var(--sidebar-hover); margin: 20px 0; border-style: solid; border-width: 1px 0 0 0; }
+        nav .cart-nav { justify-content: space-between; }
+        .cart-badge { background: var(--primary); color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: bold; transition: 0.3s; }
+
+        .content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+        .section { display: none; animation: fadeIn 0.4s ease; }
+        .section.active { display: block; }
+        .section h2 { font-size: 32px; margin-top: 0; margin-bottom: 30px; color: var(--text); border-bottom: 2px solid #E5E7EB; padding-bottom: 10px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+        .product { background: var(--card-bg); border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.04); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; }
+        .product:hover { transform: translateY(-7px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
+        .product img { width: 100%; height: 180px; object-fit: contain; margin-bottom: 20px; border-radius: 8px; transition: 0.3s; }
+        .product:hover img { transform: scale(1.05); }
+        .product h3 { margin: 0 0 10px 0; font-size: 20px; }
+        .product p { color: var(--text-muted); font-size: 14px; margin: 0 0 20px 0; flex-grow: 1; line-height: 1.5; }
+        .price-row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+        .price { font-size: 22px; font-weight: 700; color: var(--text); }
+        
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; }
+        .btn:hover:not(:disabled) { background: var(--primary-hover); transform: scale(1.05); }
+        .btn:active:not(:disabled) { transform: scale(0.95); }
+        .btn:disabled { cursor: default; } 
+        
+        .delete-btn { background: #EF4444; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .delete-btn:hover { background: #DC2626; transform: scale(1.1); }
+
+        .cart-item { background: white; padding: 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border: 1px solid #E5E7EB; }
+        .checkout-panel { background: white; padding: 30px; border-radius: 16px; margin-top: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); max-width: 500px; border: 1px solid #E5E7EB; }
+        .checkout-panel label { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block; }
+        .checkout-panel input, .checkout-panel select { width: 100%; padding: 14px; margin-bottom: 20px; border: 2px solid #E5E7EB; border-radius: 10px; font-size: 16px; outline: none; transition: 0.2s; background: white; }
+        .checkout-panel input:focus, .checkout-panel select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); }
+        
+        .total-price { font-size: 28px; font-weight: bold; margin-bottom: 25px; color: var(--text); }
+        .empty-cart { color: var(--text-muted); font-style: italic; font-size: 16px; }
+
+        #toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+        .toast { background: #1F2937; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 10px 15px rgba(0,0,0,0.2); font-weight: 600; font-size: 15px; transform: translateX(120%); animation: slideIn 0.3s forwards, fadeOut 0.3s 2.5s forwards; border-left: 5px solid #10B981; }
+        @keyframes slideIn { to { transform: translateX(0); } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2 class="logo" onclick="easterEgg()">Bobrisk.shop</h2>
+        <div class="nav-item" onclick="showSection('goods')">📦 Товари</div>
+        <div class="nav-item" onclick="showSection('animals')">🦫 Тварини</div>
+        <div class="nav-item" onclick="showSection('currency')">🪙 Валюта</div>
+        <hr>
+        <div class="nav-item cart-nav" onclick="showSection('cart')">
+            <span>🛒 Кошик</span>
+            <span class="cart-badge" id="cartCount">0</span>
+        </div>
+        <div class="nav-item" onclick="showSection('spent')">💸 Витрачено</div>
+    </nav>
+
+    <div class="content">
+        <div id="goods" class="section active">
+            <h2>Товари</h2>
+            <div class="grid">
+                <div class="product">
+                    <img src="toilet.png" alt="Золотий туалет">
+                    <h3>Золотий туалет</h3>
+                    <p>Для справжніх королів.</p>
+                    <div class="price-row"><span class="price">3,996 грн</span><button class="btn add-btn" data-name="Золотий туалет" onclick="addToCart('Золотий туалет', 3996, this)">В кошик</button></div>
+                </div>
+                <div class="product">
+                    <img src="paper.png" alt="Папір LUX">
+                    <h3>Папір LUX</h3>
+                    <p>М'якість понад усе.</p>
+                    <div class="price-row"><span class="price">559 грн</span><button class="btn add-btn" data-name="Папір LUX" onclick="addToCart('Папір LUX', 559, this)">В кошик</button></div>
+                </div>
+                <div class="product">
+                    <img src="comp.png" alt="ПК зі звалища">
+                    <h3>ПК зі звалища</h3>
+                    <p>Ретро-геймінг за копійки.</p>
+                    <div class="price-row"><span class="price">12 грн</span><button class="btn add-btn" data-name="ПК зі звалища" onclick="addToCart('ПК зі звалища', 12, this)">В кошик</button></div>
+                </div>
+                <!-- НОВІ ТОВАРИ -->
+                <div class="product">
+                    <img src="ca.png" alt="Бревно на колізиках">
+                    <h3>Бревно на колізиках</h3>
+                    <p>Швидкісний бобровий еко-транспорт.</p>
+                    <div class="price-row"><span class="price">27,906 грн</span><button class="btn add-btn" data-name="Бревно на колізиках" onclick="addToCart('Бревно на колізиках', 27906, this)">В кошик</button></div>
+                </div>
+                <div class="product">
+                    <img src="ba.png" alt="Банан">
+                    <h3>Банан</h3>
+                    <p>Просто банан. Але преміальний.</p>
+                    <div class="price-row"><span class="price">700 грн</span><button class="btn add-btn" data-name="Банан" onclick="addToCart('Банан', 700, this)">В кошик</button></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="animals" class="section">
+            <h2>Тварини</h2>
+            <div class="grid">
+                <div class="product">
+                    <img src="ebob.png" alt="Європейський бобер">
+                    <h3>Європейський бобер</h3>
+                    <p>Вихований та стильний.</p>
+                    <div class="price-row"><span class="price">11,678 грн</span><button class="btn add-btn" data-name="Європейський бобер" onclick="addToCart('Європейський бобер', 11678, this)">В кошик</button></div>
+                </div>
+                <div class="product">
+                    <img src="bob.png" alt="Бобер оригінальний">
+                    <h3>Бобер оригінальний</h3>
+                    <p>Легенда лісу.</p>
+                    <div class="price-row"><span class="price">190,526 грн</span><button class="btn add-btn" data-name="Бобер оригінальний" onclick="addToCart('Бобер оригінальний', 190526, this)">В кошик</button></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="currency" class="section">
+            <h2>Валюта</h2>
+            <div class="grid">
+                <div class="product">
+                    <img src="sbob.png" alt="Бобер у касці">
+                    <h3>Бобер у касці</h3>
+                    <p>Ще у розробці.</p>
+                    <div class="price-row"><span class="price">∞ грн</span><button class="btn" style="background: #9CA3AF; cursor: not-allowed;" disabled>Недоступно</button></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cart" class="section">
+            <h2>Оформлення замовлення</h2>
+            <div id="cartItems"><p class="empty-cart">Тут поки порожньо.</p></div>
+            <div class="checkout-panel">
+                <div class="total-price">Разом: <span id="totalSum">0</span> грн</div>
+                
+                <label>Промокод (якщо є):</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <input type="text" id="promoInput" placeholder="Введіть код..." style="margin-bottom: 0;">
+                    <button class="btn" style="background: #374151; white-space: nowrap;" onclick="applyPromo()">Застосувати</button>
+                </div>
+                
+                <label>Ваша боброва картка (ім'я):</label>
+                <input type="text" id="cardInput" placeholder="bobrouser-XXXXXX" oninput="saveManualCard()">
+                
+                <button class="btn" style="width: 100%; margin-bottom: 25px; background: #10B981;" onclick="window.location.href='bank.html'">💳 Отримати боброву картку</button>
+                
+                <label>Пункт видачі (Нова Пошта):</label>
+                <select id="np">
+                    <option>Нова пошта Делятин</option>
+                    <option>Нова пошта Яремче</option>
+                    <option>Нова пошта Надвірна</option>
+                </select>
+                
+                <button class="btn" style="width: 100%; font-size: 18px; padding: 15px;" onclick="checkout()">🚀 Сплатити та Замовити</button>
+            </div>
+        </div>
+        
+        <!-- Вкладка Витрачено -->
+        <div id="spent" class="section">
+            <h2>Ваші витрати за сьогодні</h2>
+            <div class="checkout-panel">
+                <div class="total-price" style="color: #EF4444; font-size: 36px;"><span id="spentSumUI">0</span> грн</div>
+                <p style="color: var(--text-muted); font-style: italic; margin-top: 10px;">* Чим менше, тим краще. Бобри пильно стежать за вашим бюджетом.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('bobCart')) || [];
+        let total = parseFloat(localStorage.getItem('bobTotal')) || 0;
+        let promoApplied = false; 
+        
+        // Система витрат за день
+        let todayStr = new Date().toLocaleDateString();
+        let dailySpentData = JSON.parse(localStorage.getItem('bobDailySpent')) || { date: todayStr, amount: 0 };
+        // Якщо настав новий день - скидаємо суму
+        if (dailySpentData.date !== todayStr) {
+            dailySpentData = { date: todayStr, amount: 0 };
+            localStorage.setItem('bobDailySpent', JSON.stringify(dailySpentData));
+        }
+
+        function updateSpentUI() {
+            document.getElementById('spentSumUI').innerText = dailySpentData.amount.toLocaleString('uk-UA');
+        }
+
+        function showToast(message, isError = false) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = message;
+            if(isError) toast.style.borderLeftColor = '#EF4444'; 
+            
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
+
+        function easterEgg() {
+            showToast("🦫 Курррва бобер! Які люди!");
+        }
+
+        function saveCart() {
+            localStorage.setItem('bobCart', JSON.stringify(cart));
+            localStorage.setItem('bobTotal', total);
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function addToCart(name, price, buttonElement) {
+            cart.push({name: name, price: price});
+            // Перераховуємо суму (щоб уникнути багів з промокодами)
+            recalculateTotal(); 
+            
+            buttonElement.innerText = "✓ Додано";
+            buttonElement.style.background = "#10B981";
+            buttonElement.disabled = true; 
+            
+            showToast("📦 " + name + " успішно додано!");
+        }
+        
+        // Нова функція: Видалення з кошика
+        function removeFromCart(index) {
+            let removedItemName = cart[index].name;
+            
+            // Якщо був промокод, скидаємо його при зміні кошика, щоб не було мінусів
+            if(promoApplied) {
+                showToast("⚠️ Промокод скасовано через зміну кошика", true);
+                promoApplied = false;
+                document.getElementById('promoInput').value = '';
+            }
+            
+            cart.splice(index, 1);
+            recalculateTotal(); // Перераховуємо з нуля
+            
+            // Відновлюємо кнопку товару
+            let addButtons = document.querySelectorAll('.add-btn');
+            addButtons.forEach(btn => {
+                if (btn.getAttribute('data-name') === removedItemName) {
+                    btn.innerText = "В кошик";
+                    btn.style.background = "var(--primary)";
+                    btn.disabled = false;
+                }
+            });
+            
+            showToast("🗑️ Товар видалено з кошика");
+        }
+        
+        // Перерахунок суми з нуля (безпечно для видалення)
+        function recalculateTotal() {
+            total = cart.reduce((sum, item) => sum + item.price, 0);
+            if (promoApplied) {
+                let code = document.getElementById('promoInput').value.trim().toUpperCase();
+                if (code === "DEREVO") total = total * 0.9;
+                else if (code === "BOBERVTAPKAX") total = total * 0.01;
+            }
+            saveCart();
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.length;
+            document.getElementById('totalSum').innerText = Math.round(total).toLocaleString('uk-UA');
+            
+            let cartDiv = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                cartDiv.innerHTML = '<p class="empty-cart">Тут поки порожньо. Додайте щось, щоб порадувати бобра!</p>';
+                return;
+            }
+            cartDiv.innerHTML = '';
+            cart.forEach((item, index) => {
+                cartDiv.innerHTML += `<div class="cart-item">
+                    <span style="font-weight: 600; font-size: 18px;">${item.name}</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-weight: bold; font-size: 18px; color: var(--primary);">${item.price.toLocaleString('uk-UA')} грн</span>
+                        <button class="delete-btn" onclick="removeFromCart(${index})">❌</button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function applyPromo() {
+            if(cart.length === 0) return showToast("❌ Кошик порожній, на що знижку робити?", true);
+            if(promoApplied) return showToast("⚠️ Промокод вже застосовано!", true);
+            
+            let code = document.getElementById('promoInput').value.trim().toUpperCase();
+
+            if (code === "DEREVO" || code === "BOBERVTAPKAX") {
+                promoApplied = true;
+                recalculateTotal();
+                if(code === "BOBERVTAPKAX") showToast("😎 О, та це ж свій! Знижка 99% активована!");
+                else showToast("✅ Знижка 10% застосована!");
+            } else {
+                showToast("❌ Такого промокоду не існує", true);
+            }
+        }
+
+        function checkButtons() {
+            let addButtons = document.querySelectorAll('.add-btn');
+            addButtons.forEach(btn => {
+                let itemName = btn.getAttribute('data-name');
+                let inCart = cart.some(item => item.name === itemName);
+                if(inCart) {
+                    btn.innerText = "✓ Додано";
+                    btn.style.background = "#10B981";
+                    btn.disabled = true;
+                }
+            });
+        }
+
+        function saveManualCard() {
+            let val = document.getElementById('cardInput').value;
+            localStorage.setItem('bobcard', val);
+        }
+
+        function checkout() {
+            if(cart.length === 0) {
+                showToast("❌ Ваш кошик порожній!", true);
+                return;
+            }
+            
+            let uniqueItems = new Set(cart.map(item => item.name)).size;
+            // Античіт спрацює, якщо додати 5 або більше унікальних товарів
+            if(uniqueItems >= 5) {
+                alert("🚨 Ваша транзакція була заблокована! Бобри помітили хитрість.");
+                window.location.href = 'blocked.html';
+                return;
+            }
+
+            let card = document.getElementById('cardInput').value;
+            
+            if(card && card.startsWith('bobrouser-')) {
+                let time = Math.random() < 0.01 ? "через неділю" : "НІКОЛИ";
+                alert(`✅ Оплата успішна з картки ${card}!\n\nТовар відправлено!\nПриїде: ${time}`);
+                
+                // Додаємо суму до витраченого за день
+                dailySpentData.amount += total;
+                localStorage.setItem('bobDailySpent', JSON.stringify(dailySpentData));
+                updateSpentUI(); // Оновлюємо відображення вкладки "Витрачено"
+                
+                cart = [];
+                total = 0;
+                promoApplied = false;
+                document.getElementById('promoInput').value = '';
+                saveCart();
+                updateCartUI();
+                
+                document.querySelectorAll('.add-btn').forEach(btn => {
+                    btn.innerText = "В кошик";
+                    btn.style.background = "var(--primary)";
+                    btn.disabled = false;
+                });
+                
+                showSection('goods');
+            } else { 
+                showToast("❌ Введіть дійсну боброву картку (bobrouser-...)", true); 
+            }
+        }
+
+        window.onload = function() {
+            updateCartUI();
+            checkButtons();
+            updateSpentUI();
+            
+            let savedCard = localStorage.getItem('bobcard');
+            if(savedCard) document.getElementById('cardInput').value = savedCard;
+
+            if(window.location.hash === '#cart') {
+                showSection('cart');
+            }
+        };
+    </script>
+</body>
+</html>

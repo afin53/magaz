@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЗАБЛОКОВАНО - Bobrisk</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: #111827; /* Темний страшний фон */
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .alert-box { 
+            background: #1F2937; 
+            padding: 40px; 
+            border-radius: 16px; 
+            text-align: center; 
+            max-width: 500px; 
+            width: 100%; 
+            border: 2px solid #EF4444; /* Червона рамка */
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+        }
+        h1 { color: #EF4444; font-size: 32px; margin-top: 0; text-transform: uppercase; }
+        p { font-size: 18px; line-height: 1.5; color: #D1D5DB; margin-bottom: 25px; }
+        textarea { 
+            width: 100%; 
+            height: 120px; 
+            padding: 15px; 
+            border-radius: 10px; 
+            border: 1px solid #4B5563; 
+            background: #374151; 
+            color: white; 
+            font-size: 16px; 
+            resize: none; 
+            outline: none;
+            margin-bottom: 20px;
+        }
+        textarea:focus { border-color: #EF4444; }
+        button { 
+            background: #EF4444; 
+            color: white; 
+            border: none; 
+            padding: 15px 20px; 
+            border-radius: 10px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: 100%; 
+            transition: 0.2s;
+        }
+        button:hover { background: #DC2626; transform: scale(1.02); }
+    </style>
+</head>
+<body>
+
+    <div class="alert-box">
+        <h1>🚨 Транзакцію заблоковано</h1>
+        <p>Бобри-аудитори помітили хитрість! Ви намагалися скупити весь магазин. Ваша картка тимчасово заморожена.<br><br>Напишіть апеляцію до Верховної Бобрової Ради для розблокування.</p>
+        
+        <textarea id="appealText" placeholder="Я більше так не буду... (мінімум 20 символів)"></textarea>
+        
+        <button onclick="submitAppeal()">Подати апеляцію</button>
+    </div>
+
+    <script>
+        function submitAppeal() {
+            let text = document.getElementById('appealText').value;
+            
+            if (text.length > 20) {
+                alert("✅ Ваша картка розблокована!\n\nАЛЕ весь рахунок знятий як штраф.\nТож створіть нову картку в банку.");
+                
+                // Очищаємо всі дані!
+                localStorage.removeItem('bobcard');
+                localStorage.removeItem('bobCart');
+                localStorage.removeItem('bobTotal');
+                
+                // Відправляємо в банк робити нову карту
+                window.location.href = 'bank.html';
+            } else {
+                alert("❌ Апеляція занадто коротка!\nБобри вам не вірять. Напишіть більше 20 символів.");
+            }
+        }
+    </script>
+
+</body>
+</html>
