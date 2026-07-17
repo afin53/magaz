@@ -44,7 +44,7 @@
         .product h3 { margin: 0 0 10px 0; font-size: 20px; }
         .product p { color: var(--text-muted); font-size: 14px; margin: 0 0 20px 0; flex-grow: 1; line-height: 1.5; }
         .price-row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .price { font-size: 22px; font-weight: 700; color: var(--text); }
+        .price { font-size: 20px; font-weight: 700; color: var(--text); }
         
         .btn { background: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; }
         .btn:hover:not(:disabled) { background: var(--primary-hover); transform: scale(1.05); }
@@ -67,6 +67,35 @@
         .toast { background: #1F2937; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 10px 15px rgba(0,0,0,0.2); font-weight: 600; font-size: 15px; transform: translateX(120%); animation: slideIn 0.3s forwards, fadeOut 0.3s 2.5s forwards; border-left: 5px solid #10B981; }
         @keyframes slideIn { to { transform: translateX(0); } }
         @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
+
+        /* Стилі для Колеса Фортуни */
+        .wheel-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(17, 24, 39, 0.9); z-index: 2000;
+            display: none; justify-content: center; align-items: center; flex-direction: column;
+        }
+        .wheel-box {
+            background: #1F2937; padding: 40px; border-radius: 20px; text-align: center;
+            border: 2px solid var(--primary); box-shadow: 0 0 40px rgba(79, 70, 229, 0.4);
+        }
+        .wheel-box h2 { margin-top: 0; color: white; font-size: 28px; }
+        .wheel-container { position: relative; width: 280px; height: 280px; margin: 30px auto; }
+        .pointer {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            font-size: 45px; color: #FBBF24; z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .wheel {
+            width: 100%; height: 100%; border-radius: 50%;
+            /* 1% зелений (0 до 3.6 градусів), 99% червоний */
+            background: conic-gradient(#10B981 0deg 3.6deg, #EF4444 3.6deg 360deg);
+            border: 6px solid white; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
+        }
+        .wheel-legend { display: flex; justify-content: center; gap: 20px; margin-top: 20px; color: white; font-weight: bold; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 18px; }
+        .color-box { width: 18px; height: 18px; border-radius: 4px; }
+        .bg-green { background: #10B981; }
+        .bg-red { background: #EF4444; }
     </style>
 </head>
 <body>
@@ -105,7 +134,6 @@
                     <p>Ретро-геймінг за копійки.</p>
                     <div class="price-row"><span class="price">12 грн</span><button class="btn add-btn" data-name="ПК зі звалища" onclick="addToCart('ПК зі звалища', 12, this)">В кошик</button></div>
                 </div>
-                <!-- НОВІ ТОВАРИ -->
                 <div class="product">
                     <img src="ca.png" alt="Бревно на колізиках">
                     <h3>Бревно на колізиках</h3>
@@ -117,6 +145,32 @@
                     <h3>Банан</h3>
                     <p>Просто банан. Але преміальний.</p>
                     <div class="price-row"><span class="price">700 грн</span><button class="btn add-btn" data-name="Банан" onclick="addToCart('Банан', 700, this)">В кошик</button></div>
+                </div>
+
+                <!-- НОВІ ТОВАРИ (МЕГА-ОНОВЛЕННЯ) -->
+                <div class="product">
+                    <img src="bobromask.png" alt="Бобр маск">
+                    <h3>Бобр маск</h3>
+                    <p>Технологічний геній і мільярдер.</p>
+                    <div class="price-row"><span class="price">583,098 грн</span><button class="btn add-btn" data-name="Бобр маск" onclick="addToCart('Бобр маск', 583098, this)">В кошик</button></div>
+                </div>
+                <div class="product">
+                    <img src="sarai.png" alt="Елітний сарай">
+                    <h3>Елітний сарай</h3>
+                    <p>Пентхаус твоєї мрії у лісі.</p>
+                    <div class="price-row"><span class="price">10 987 557 476 грн</span><button class="btn add-btn" data-name="Елітний сарай" onclick="addToCart('Елітний сарай', 10987557476, this)">В кошик</button></div>
+                </div>
+                <div class="product">
+                    <img src="pass.png" alt="Паспорт бобра">
+                    <h3>Паспорт бобра</h3>
+                    <p>Офіційна легалізація в Боброленді.</p>
+                    <div class="price-row"><span class="price">90,876 грн</span><button class="btn add-btn" data-name="Паспорт бобра" onclick="addToCart('Паспорт бобра', 90876, this)">В кошик</button></div>
+                </div>
+                <div class="product">
+                    <img src="tank.png" alt="Танк">
+                    <h3>Танк</h3>
+                    <p>Надійний аргумент у будь-якій суперечці.</p>
+                    <div class="price-row"><span class="price">700,000 грн</span><button class="btn add-btn" data-name="Танк" onclick="addToCart('Танк', 700000, this)">В кошик</button></div>
                 </div>
             </div>
         </div>
@@ -179,12 +233,29 @@
             </div>
         </div>
         
-        <!-- Вкладка Витрачено -->
         <div id="spent" class="section">
             <h2>Ваші витрати за сьогодні</h2>
             <div class="checkout-panel">
                 <div class="total-price" style="color: #EF4444; font-size: 36px;"><span id="spentSumUI">0</span> грн</div>
                 <p style="color: var(--text-muted); font-style: italic; margin-top: 10px;">* Чим менше, тим краще. Бобри пильно стежать за вашим бюджетом.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальне вікно: Колесо Фортуни -->
+    <div id="wheelModal" class="wheel-modal">
+        <div class="wheel-box">
+            <h2>Колесо Доставки</h2>
+            <p style="color: #9CA3AF; font-size: 16px; margin-bottom: 20px;">Оплата успішна! Гроші списано.<br>Крутимо рулетку шансів на доставку...</p>
+            
+            <div class="wheel-container">
+                <div class="pointer">▼</div>
+                <div class="wheel" id="fortuneWheel"></div>
+            </div>
+            
+            <div class="wheel-legend">
+                <div class="legend-item"><div class="color-box bg-green"></div> 1% Прийде</div>
+                <div class="legend-item"><div class="color-box bg-red"></div> 99% НЕ прийде</div>
             </div>
         </div>
     </div>
@@ -196,10 +267,8 @@
         let total = parseFloat(localStorage.getItem('bobTotal')) || 0;
         let promoApplied = false; 
         
-        // Система витрат за день
         let todayStr = new Date().toLocaleDateString();
         let dailySpentData = JSON.parse(localStorage.getItem('bobDailySpent')) || { date: todayStr, amount: 0 };
-        // Якщо настав новий день - скидаємо суму
         if (dailySpentData.date !== todayStr) {
             dailySpentData = { date: todayStr, amount: 0 };
             localStorage.setItem('bobDailySpent', JSON.stringify(dailySpentData));
@@ -236,7 +305,6 @@
 
         function addToCart(name, price, buttonElement) {
             cart.push({name: name, price: price});
-            // Перераховуємо суму (щоб уникнути багів з промокодами)
             recalculateTotal(); 
             
             buttonElement.innerText = "✓ Додано";
@@ -246,21 +314,16 @@
             showToast("📦 " + name + " успішно додано!");
         }
         
-        // Нова функція: Видалення з кошика
         function removeFromCart(index) {
             let removedItemName = cart[index].name;
-            
-            // Якщо був промокод, скидаємо його при зміні кошика, щоб не було мінусів
             if(promoApplied) {
                 showToast("⚠️ Промокод скасовано через зміну кошика", true);
                 promoApplied = false;
                 document.getElementById('promoInput').value = '';
             }
-            
             cart.splice(index, 1);
-            recalculateTotal(); // Перераховуємо з нуля
+            recalculateTotal(); 
             
-            // Відновлюємо кнопку товару
             let addButtons = document.querySelectorAll('.add-btn');
             addButtons.forEach(btn => {
                 if (btn.getAttribute('data-name') === removedItemName) {
@@ -269,11 +332,9 @@
                     btn.disabled = false;
                 }
             });
-            
             showToast("🗑️ Товар видалено з кошика");
         }
         
-        // Перерахунок суми з нуля (безпечно для видалення)
         function recalculateTotal() {
             total = cart.reduce((sum, item) => sum + item.price, 0);
             if (promoApplied) {
@@ -340,6 +401,42 @@
             localStorage.setItem('bobcard', val);
         }
 
+        // ЛОГІКА КОЛЕСА ФОРТУНИ
+        function spinWheel(isWin) {
+            const wheel = document.getElementById('fortuneWheel');
+            
+            // Крутимо 10 повних обертів (3600 градусів)
+            let baseRotations = 360 * 10; 
+            
+            // Якщо виграв - зупиняємось рівно на зеленому (0 градусів). 
+            // Якщо програв - додаємо від 10 до 350 градусів, щоб точно потрапити в червоне.
+            let extraAngle = isWin ? 0 : (Math.floor(Math.random() * 340) + 10); 
+            let finalAngle = baseRotations + extraAngle;
+
+            // Запускаємо анімацію
+            wheel.style.transform = `rotate(${finalAngle}deg)`;
+
+            // Чекаємо завершення анімації (4 секунди)
+            setTimeout(() => {
+                if (isWin) {
+                    alert("🎉 ОЦЕ ТАК ФАРТ! Ти вибив 1%!\nТовар успішно відправлено. Бобри вже в дорозі.");
+                } else {
+                    alert("❌ УПС... Товар НЕ ПРИЙДЕ (шанс 99%).\nГроші успішно списані у Фонд Розвитку Бобрів. Дякуємо за пожертву!");
+                }
+                
+                // Ховаємо модалку
+                document.getElementById('wheelModal').style.display = 'none';
+                
+                // Скидаємо колесо в нуль без анімації для наступного разу
+                wheel.style.transition = 'none';
+                wheel.style.transform = 'rotate(0deg)';
+                setTimeout(() => { wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)'; }, 50);
+                
+                // Повертаємо на головну
+                showSection('goods');
+            }, 4200);
+        }
+
         function checkout() {
             if(cart.length === 0) {
                 showToast("❌ Ваш кошик порожній!", true);
@@ -347,8 +444,8 @@
             }
             
             let uniqueItems = new Set(cart.map(item => item.name)).size;
-            // Античіт спрацює, якщо додати 5 або більше унікальних товарів
-            if(uniqueItems >= 5) {
+            // Збільшив ліміт до 8, бо товарів стало більше
+            if(uniqueItems >= 8) {
                 alert("🚨 Ваша транзакція була заблокована! Бобри помітили хитрість.");
                 window.location.href = 'blocked.html';
                 return;
@@ -357,14 +454,12 @@
             let card = document.getElementById('cardInput').value;
             
             if(card && card.startsWith('bobrouser-')) {
-                let time = Math.random() < 0.01 ? "через неділю" : "НІКОЛИ";
-                alert(`✅ Оплата успішна з картки ${card}!\n\nТовар відправлено!\nПриїде: ${time}`);
-                
-                // Додаємо суму до витраченого за день
+                // 1. Гроші знімаємо у будь-якому випадку!
                 dailySpentData.amount += total;
                 localStorage.setItem('bobDailySpent', JSON.stringify(dailySpentData));
-                updateSpentUI(); // Оновлюємо відображення вкладки "Витрачено"
+                updateSpentUI(); 
                 
+                // 2. Очищуємо кошик
                 cart = [];
                 total = 0;
                 promoApplied = false;
@@ -372,13 +467,22 @@
                 saveCart();
                 updateCartUI();
                 
+                // 3. Відновлюємо кнопки "В кошик"
                 document.querySelectorAll('.add-btn').forEach(btn => {
                     btn.innerText = "В кошик";
                     btn.style.background = "var(--primary)";
                     btn.disabled = false;
                 });
                 
-                showSection('goods');
+                // 4. ПОКАЗУЄМО КОЛЕСО ФОРТУНИ
+                document.getElementById('wheelModal').style.display = 'flex';
+                
+                // Визначаємо долю (1% шанс на перемогу)
+                let isWin = Math.random() < 0.01; 
+                
+                // Запускаємо крутіння через півсекунди
+                setTimeout(() => { spinWheel(isWin); }, 500);
+                
             } else { 
                 showToast("❌ Введіть дійсну боброву картку (bobrouser-...)", true); 
             }
